@@ -5,82 +5,126 @@
   <title>Anti-Découragement</title>
   <style>
     body {
-      background-color: #1c1c1c;
-      color: #ffffff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 2em;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #fff;
     }
+
     h1 {
-      color: #00ffcc;
+      font-size: 2.5em;
+      margin-bottom: 10px;
     }
-    input, button {
-      padding: 0.6em;
-      font-size: 1em;
-      border-radius: 8px;
+
+    p {
+      margin-bottom: 20px;
+      font-size: 1.1em;
+      text-align: center;
+    }
+
+    textarea {
+      width: 90%;
+      max-width: 400px;
+      height: 100px;
+      padding: 15px;
+      font-size: 16px;
       border: none;
-      margin: 0.5em;
+      border-radius: 10px;
+      resize: none;
     }
-    input {
-      width: 320px;
-    }
+
     button {
-      background-color: #00b894;
-      color: white;
+      margin-top: 15px;
+      padding: 10px 25px;
+      font-size: 16px;
+      background-color: #22c55e;
+      border: none;
+      border-radius: 10px;
       cursor: pointer;
+      color: white;
+      transition: 0.3s ease;
     }
-    #reponse {
-      margin-top: 1.5em;
-      font-size: 1.2em;
-      color: #ffeaa7;
+
+    button:hover {
+      background-color: #16a34a;
+    }
+
+    .response {
+      margin-top: 25px;
+      background-color: #ffffff22;
+      padding: 15px;
+      border-radius: 15px;
+      max-width: 400px;
+      width: 90%;
+      font-weight: bold;
+      font-size: 1.1em;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      text-align: center;
+      animation: fadeIn 1s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-20px);}
+      to {opacity: 1; transform: translateY(0);}
     }
   </style>
 </head>
 <body>
-
-  <h1>💬 Anti-Découragement</h1>
-  <p>Entre une phrase qui t’a découragé, et reçois une réponse inspirante.</p>
-  <input type="text" id="phraseInput" placeholder="Ex : Tu n'y arriveras jamais..." />
-  <button onclick="repondre()">Répondre</button>
-
-  <div id="reponse"></div>
+  <div class="container">
+    <h1>💪 Anti-Découragement</h1>
+    <p>Écris ce qui te bloque, et je te relance avec une phrase motivante !</p>
+    <textarea id="inputPhrase" placeholder="Ex: Je suis nul..."></textarea><br>
+    <button onclick="repondre()">Réponds-moi</button>
+    <div class="response" id="output"></div>
+  </div>
 
   <script>
-    const motsNegatifs = [
-      "jamais", "nul", "perds", "difficile", "rêves", "pas", "impossible",
-      "bête", "idiot", "abandonne", "laisse tomber", "incapable", "stupide"
-    ];
-
-    const reponsesPositives = [
-      "Chaque difficulté est une opportunité déguisée.",
-      "Ta valeur ne dépend pas de l'opinion des autres.",
-      "Tu es plus fort que tu ne le crois.",
-      "Les plus grands ont d’abord été des rêveurs.",
-      "Ton intelligence brille à travers tes efforts.",
-      "Tu es capable de grandes choses.",
-      "Le doute n’empêche pas l’action, il la prépare.",
-      "Continue à avancer, même doucement."
+    const messages = [
+      { mots: ["nul", "incapable", "stupide"], reponse: "Tu n’es pas nul. Tu apprends et tu t’améliores chaque jour." },
+      { mots: ["jamais", "impossible", "échec"], reponse: "Rien n’est impossible. Chaque échec t’emmène plus loin." },
+      { mots: ["trop dur", "difficile"], reponse: "Les défis te rendent plus fort. Continue, tu y arriveras." },
+      { mots: ["perds ton temps", "inutile"], reponse: "Rien n’est inutile. Chaque pas est un progrès." },
+      { mots: ["rêve", "rêver", "fantasme"], reponse: "Les rêves sont le début de la réussite. N’arrête jamais." },
+      { mots: ["peur", "angoisse", "stress"], reponse: "Tu es plus fort que tes peurs. Respire et avance." }
     ];
 
     function repondre() {
-      const phrase = document.getElementById("phraseInput").value.toLowerCase();
-      const reponseDiv = document.getElementById("reponse");
+      const input = document.getElementById("inputPhrase").value.toLowerCase();
+      const output = document.getElementById("output");
 
-      if (!phrase.trim()) {
-        reponseDiv.textContent = "⛔️ Écris une phrase d’abord.";
+      if (input.trim() === "") {
+        output.textContent = "Écris une phrase pour recevoir un encouragement.";
         return;
       }
 
-      const negatifTrouve = motsNegatifs.some(mot => phrase.includes(mot));
-
-      if (negatifTrouve) {
-        const index = Math.floor(Math.random() * reponsesPositives.length);
-        reponseDiv.textContent = "💡 " + reponsesPositives[index];
-      } else {
-        reponseDiv.textContent = "✅ Aucun découragement détecté.";
+      let trouve = false;
+      for (const m of messages) {
+        if (m.mots.some(mot => input.includes(mot))) {
+          output.textContent = m.reponse;
+          trouve = true;
+          break;
+        }
+      }
+      if (!trouve) {
+        output.textContent = "Tu avances déjà. Continue, tu es sur la bonne voie !";
       }
     }
   </script>
-
 </body>
 </html>
