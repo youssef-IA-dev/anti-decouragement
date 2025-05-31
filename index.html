@@ -1,43 +1,137 @@
-<script>
-  // Fonction pour supprimer les accents
-  function enleverAccents(str) {
-    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  }
-
-  const messages = [
-    { mots: ["nul", "incapable", "stupide"], reponse: "Tu n’es pas nul. Tu apprends et tu progresses." },
-    { mots: ["jamais", "impossible", "echec"], reponse: "Chaque échec est une leçon. Tu vas réussir." },
-    { mots: ["difficile", "trop dur"], reponse: "Ce qui est difficile te rend plus fort." },
-    { mots: ["fatigue", "epuise"], reponse: "Repose-toi, mais n’abandonne pas. Tu es proche du but." },
-    { mots: ["peur", "angoisse", "stress"], reponse: "Tu es plus fort que tes peurs. Tu avances déjà." },
-    { mots: ["rien", "inutile"], reponse: "Chaque action compte. Tu bâtis ton avenir." },
-  ];
-
-  function repondre() {
-    const input = document.getElementById("inputPhrase");
-    let texte = input.value.trim();
-
-    if (texte === "") {
-      alert("Écris quelque chose pour recevoir une réponse !");
-      return;
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Anti-Découragement</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #fff;
+      animation: fondAnime 10s infinite alternate;
     }
 
-    texte = enleverAccents(texte.toLowerCase());
-    const log = document.getElementById("log");
+    @keyframes fondAnime {
+      0% { background-color: #3b82f6; }
+      100% { background-color: #06b6d4; }
+    }
 
-    let reponse = "Tu es sur le bon chemin. Continue ainsi !";
-    for (const m of messages) {
-      if (m.mots.some(mot => texte.includes(mot))) {
-        reponse = m.reponse;
-        break;
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-family: 'Poppins', sans-serif;
+      text-shadow: 1px 1px 2px #000;
+    }
+
+    p {
+      margin-bottom: 20px;
+      font-size: 1.1em;
+      text-align: center;
+    }
+
+    textarea {
+      width: 90%;
+      max-width: 400px;
+      height: 100px;
+      padding: 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      resize: none;
+    }
+
+    button {
+      margin: 10px;
+      padding: 10px 25px;
+      font-size: 16px;
+      background-color: #22c55e;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    #historique {
+      margin-top: 30px;
+      width: 90%;
+      max-width: 500px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>💡 Anti-Découragement</h1>
+  <p>Écris ce que tu ressens, et reçois un message de motivation !</p>
+
+  <textarea id="inputMessage" placeholder="Exemple : je suis fatigué..."></textarea>
+  <button onclick="repondre()">Réponds</button>
+  <button onclick="reinitialiser()">🧹 Réinitialiser</button>
+
+  <div id="historique"></div>
+
+  <audio id="son" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+
+  <script>
+    const reponses = {
+      fatigue: [
+        "Repose-toi, mais n’abandonne pas. Tu es proche du but.",
+        "Même les héros se reposent. Tu vas y arriver.",
+        "Une pause ne signifie pas un abandon. Tu peux le faire !"
+      ],
+      peur: [
+        "Tu es plus fort que tes peurs. Tu avances déjà.",
+        "La peur est normale. Le courage, c'est de continuer malgré tout.",
+        "Affronte tes peurs, elles te rendront plus fort."
+      ],
+      echec: [
+        "Chaque échec est une leçon déguisée.",
+        "Ce n'est pas un échec, c'est une étape vers le succès.",
+        "Les plus grands ont échoué avant de réussir."
+      ],
+      vide: [
+        "Tu as le pouvoir de créer du sens, même dans le vide.",
+        "Le vide n’est qu’une toile blanche. Peins ton avenir."
+      ]
+    };
+
+    function repondre() {
+      const input = document.getElementById("inputMessage").value.toLowerCase().trim();
+      const historique = document.getElementById("historique");
+      const audio = document.getElementById("son");
+
+      let cle = Object.keys(reponses).find(mot => input.includes(mot));
+      let message;
+      if (cle) {
+        const possibles = reponses[cle];
+        message = possibles[Math.floor(Math.random() * possibles.length)];
+      } else {
+        message = "Tu es sur le bon chemin. Continue ainsi !";
       }
+
+      const bloc = `<p><strong>Tu :</strong> ${input || "(vide)"}<br><strong>Réponse :</strong> ${message}</p>`;
+      historique.innerHTML += bloc;
+      localStorage.setItem("historique", historique.innerHTML);
+      audio.play();
     }
 
-    const ligne = document.createElement("div");
-    ligne.innerHTML = `<strong>Tu :</strong> ${input.value}<br><strong>Réponse :</strong> ${reponse}`;
-    log.appendChild(ligne);
+    function reinitialiser() {
+      document.getElementById("historique").innerHTML = "";
+      localStorage.removeItem("historique");
+    }
 
-    input.value = "";
-    input.focus();
-  }
-</script>
+    window.onload = function () {
+      const ancien = localStorage.getItem("historique");
+      if (ancien) document.getElementById("historique").innerHTML = ancien;
+    };
+  </script>
+</body>
+</html>
