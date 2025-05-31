@@ -55,18 +55,24 @@
       background-color: #16a34a;
     }
 
-    .response {
+    .response-log {
       margin-top: 25px;
+      max-width: 500px;
+      width: 90%;
       background-color: #ffffff22;
       padding: 15px;
       border-radius: 15px;
-      max-width: 400px;
-      width: 90%;
-      font-weight: bold;
-      font-size: 1.1em;
-      text-align: center;
       backdrop-filter: blur(10px);
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .response-log div {
+      margin-bottom: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 10px;
     }
 
     .container {
@@ -88,42 +94,46 @@
 <body>
   <div class="container">
     <h1>💪 Anti-Découragement</h1>
-    <p>Écris ce qui te bloque, et je te relance avec une phrase motivante !</p>
-    <textarea id="inputPhrase" placeholder="Ex: Je suis nul..."></textarea><br>
+    <p>Écris ce qui te bloque, et reçois une réponse motivante !</p>
+    <textarea id="inputPhrase" placeholder="Ex: Je suis fatigué..."></textarea><br>
     <button onclick="repondre()">Réponds-moi</button>
-    <div class="response" id="output"></div>
+    <div class="response-log" id="log"></div>
   </div>
 
   <script>
     const messages = [
-      { mots: ["nul", "incapable", "stupide"], reponse: "Tu n’es pas nul. Tu apprends et tu t’améliores chaque jour." },
-      { mots: ["jamais", "impossible", "échec"], reponse: "Rien n’est impossible. Chaque échec t’emmène plus loin." },
-      { mots: ["trop dur", "difficile"], reponse: "Les défis te rendent plus fort. Continue, tu y arriveras." },
-      { mots: ["perds ton temps", "inutile"], reponse: "Rien n’est inutile. Chaque pas est un progrès." },
-      { mots: ["rêve", "rêver", "fantasme"], reponse: "Les rêves sont le début de la réussite. N’arrête jamais." },
-      { mots: ["peur", "angoisse", "stress"], reponse: "Tu es plus fort que tes peurs. Respire et avance." }
+      { mots: ["nul", "incapable", "stupide"], reponse: "Tu n’es pas nul. Tu apprends et tu progresses." },
+      { mots: ["jamais", "impossible", "échec"], reponse: "Chaque échec est une leçon. Tu vas réussir." },
+      { mots: ["difficile", "trop dur"], reponse: "Ce qui est difficile te rend plus fort." },
+      { mots: ["fatigué", "épuisé"], reponse: "Repose-toi, mais n’abandonne pas. Tu es proche du but." },
+      { mots: ["peur", "angoisse", "stress"], reponse: "Tu es plus fort que tes peurs. Tu avances déjà." },
+      { mots: ["rien", "inutile"], reponse: "Chaque action compte. Tu bâtis ton avenir." },
     ];
 
     function repondre() {
-      const input = document.getElementById("inputPhrase").value.toLowerCase();
-      const output = document.getElementById("output");
+      const input = document.getElementById("inputPhrase");
+      const texte = input.value.trim().toLowerCase();
+      const log = document.getElementById("log");
 
-      if (input.trim() === "") {
-        output.textContent = "Écris une phrase pour recevoir un encouragement.";
+      if (texte === "") {
+        alert("Écris quelque chose pour recevoir une réponse !");
         return;
       }
 
-      let trouve = false;
+      let reponse = "Tu es sur le bon chemin. Continue ainsi !";
       for (const m of messages) {
-        if (m.mots.some(mot => input.includes(mot))) {
-          output.textContent = m.reponse;
-          trouve = true;
+        if (m.mots.some(mot => texte.includes(mot))) {
+          reponse = m.reponse;
           break;
         }
       }
-      if (!trouve) {
-        output.textContent = "Tu avances déjà. Continue, tu es sur la bonne voie !";
-      }
+
+      const ligne = document.createElement("div");
+      ligne.innerHTML = `<strong>Tu :</strong> ${texte}<br><strong>Réponse :</strong> ${reponse}`;
+      log.appendChild(ligne);
+
+      input.value = "";
+      input.focus();
     }
   </script>
 </body>
