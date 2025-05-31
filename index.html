@@ -1,140 +1,43 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Anti-Découragement</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #3b82f6, #06b6d4);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      color: #fff;
+<script>
+  // Fonction pour supprimer les accents
+  function enleverAccents(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  const messages = [
+    { mots: ["nul", "incapable", "stupide"], reponse: "Tu n’es pas nul. Tu apprends et tu progresses." },
+    { mots: ["jamais", "impossible", "echec"], reponse: "Chaque échec est une leçon. Tu vas réussir." },
+    { mots: ["difficile", "trop dur"], reponse: "Ce qui est difficile te rend plus fort." },
+    { mots: ["fatigue", "epuise"], reponse: "Repose-toi, mais n’abandonne pas. Tu es proche du but." },
+    { mots: ["peur", "angoisse", "stress"], reponse: "Tu es plus fort que tes peurs. Tu avances déjà." },
+    { mots: ["rien", "inutile"], reponse: "Chaque action compte. Tu bâtis ton avenir." },
+  ];
+
+  function repondre() {
+    const input = document.getElementById("inputPhrase");
+    let texte = input.value.trim();
+
+    if (texte === "") {
+      alert("Écris quelque chose pour recevoir une réponse !");
+      return;
     }
 
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
-    }
+    texte = enleverAccents(texte.toLowerCase());
+    const log = document.getElementById("log");
 
-    p {
-      margin-bottom: 20px;
-      font-size: 1.1em;
-      text-align: center;
-    }
-
-    textarea {
-      width: 90%;
-      max-width: 400px;
-      height: 100px;
-      padding: 15px;
-      font-size: 16px;
-      border: none;
-      border-radius: 10px;
-      resize: none;
-    }
-
-    button {
-      margin-top: 15px;
-      padding: 10px 25px;
-      font-size: 16px;
-      background-color: #22c55e;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      color: white;
-      transition: 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #16a34a;
-    }
-
-    .response-log {
-      margin-top: 25px;
-      max-width: 500px;
-      width: 90%;
-      background-color: #ffffff22;
-      padding: 15px;
-      border-radius: 15px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    .response-log div {
-      margin-bottom: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 10px;
-      border-radius: 10px;
-    }
-
-    .container {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 30px;
-      border-radius: 20px;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
-      text-align: center;
-      animation: fadeIn 1s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(-20px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>💪 Anti-Découragement</h1>
-    <p>Écris ce qui te bloque, et reçois une réponse motivante !</p>
-    <textarea id="inputPhrase" placeholder="Ex: Je suis fatigué..."></textarea><br>
-    <button onclick="repondre()">Réponds-moi</button>
-    <div class="response-log" id="log"></div>
-  </div>
-
-  <script>
-    const messages = [
-      { mots: ["nul", "incapable", "stupide"], reponse: "Tu n’es pas nul. Tu apprends et tu progresses." },
-      { mots: ["jamais", "impossible", "échec"], reponse: "Chaque échec est une leçon. Tu vas réussir." },
-      { mots: ["difficile", "trop dur"], reponse: "Ce qui est difficile te rend plus fort." },
-      { mots: ["fatigué", "épuisé"], reponse: "Repose-toi, mais n’abandonne pas. Tu es proche du but." },
-      { mots: ["peur", "angoisse", "stress"], reponse: "Tu es plus fort que tes peurs. Tu avances déjà." },
-      { mots: ["rien", "inutile"], reponse: "Chaque action compte. Tu bâtis ton avenir." },
-    ];
-
-    function repondre() {
-      const input = document.getElementById("inputPhrase");
-      const texte = input.value.trim().toLowerCase();
-      const log = document.getElementById("log");
-
-      if (texte === "") {
-        alert("Écris quelque chose pour recevoir une réponse !");
-        return;
+    let reponse = "Tu es sur le bon chemin. Continue ainsi !";
+    for (const m of messages) {
+      if (m.mots.some(mot => texte.includes(mot))) {
+        reponse = m.reponse;
+        break;
       }
-
-      let reponse = "Tu es sur le bon chemin. Continue ainsi !";
-      for (const m of messages) {
-        if (m.mots.some(mot => texte.includes(mot))) {
-          reponse = m.reponse;
-          break;
-        }
-      }
-
-      const ligne = document.createElement("div");
-      ligne.innerHTML = `<strong>Tu :</strong> ${texte}<br><strong>Réponse :</strong> ${reponse}`;
-      log.appendChild(ligne);
-
-      input.value = "";
-      input.focus();
     }
-  </script>
-</body>
-</html>
+
+    const ligne = document.createElement("div");
+    ligne.innerHTML = `<strong>Tu :</strong> ${input.value}<br><strong>Réponse :</strong> ${reponse}`;
+    log.appendChild(ligne);
+
+    input.value = "";
+    input.focus();
+  }
+</script>
