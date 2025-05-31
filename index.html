@@ -12,28 +12,22 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       min-height: 100vh;
       color: #fff;
-      animation: fondAnime 10s infinite alternate;
-    }
-
-    @keyframes fondAnime {
-      0% { background-color: #3b82f6; }
-      100% { background-color: #06b6d4; }
+      padding-top: 50px;
     }
 
     h1 {
       font-size: 2.5em;
       margin-bottom: 10px;
-      font-family: 'Poppins', sans-serif;
-      text-shadow: 1px 1px 2px #000;
     }
 
     p {
       margin-bottom: 20px;
       font-size: 1.1em;
       text-align: center;
+      max-width: 500px;
     }
 
     textarea {
@@ -48,90 +42,121 @@
     }
 
     button {
-      margin: 10px;
+      margin-top: 15px;
       padding: 10px 25px;
       font-size: 16px;
       background-color: #22c55e;
+      color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #16a34a;
+    }
+
+    #resultat {
+      margin-top: 30px;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+      min-height: 100px;
     }
 
     #historique {
-      margin-top: 30px;
-      width: 90%;
-      max-width: 500px;
-      background: rgba(255, 255, 255, 0.1);
+      margin-top: 20px;
+      font-size: 0.95em;
+      background-color: rgba(0,0,0,0.2);
       padding: 15px;
       border-radius: 10px;
-      overflow-y: auto;
+      max-width: 500px;
+      width: 90%;
     }
   </style>
 </head>
 <body>
-  <h1>💡 Anti-Découragement</h1>
-  <p>Écris ce que tu ressens, et reçois un message de motivation !</p>
-
-  <textarea id="inputMessage" placeholder="Exemple : je suis fatigué..."></textarea>
-  <button onclick="repondre()">Réponds</button>
-  <button onclick="reinitialiser()">🧹 Réinitialiser</button>
-
+  <h1>💪 Anti-Découragement</h1>
+  <p>Écris ce qu’on t’a dit pour te décourager… et reçois une réponse motivante !</p>
+  <textarea id="phrase" placeholder="Ex: Tu n’y arriveras jamais..."></textarea><br>
+  <button onclick="repondre()">Réponds-moi !</button>
+  <div id="resultat"></div>
   <div id="historique"></div>
-
-  <audio id="son" src="https://www.soundjay.com/button/beep-07.wav"></audio>
 
   <script>
     const reponses = {
       fatigue: [
-        "Repose-toi, mais n’abandonne pas. Tu es proche du but.",
-        "Même les héros se reposent. Tu vas y arriver.",
-        "Une pause ne signifie pas un abandon. Tu peux le faire !"
+        "Tu as le droit d’être fatigué. Mais n’abandonne pas !",
+        "Chaque pas, même petit, est une victoire sur la fatigue."
       ],
       peur: [
-        "Tu es plus fort que tes peurs. Tu avances déjà.",
-        "La peur est normale. Le courage, c'est de continuer malgré tout.",
-        "Affronte tes peurs, elles te rendront plus fort."
+        "La peur est normale. Le courage, c’est d’agir malgré la peur.",
+        "La peur ne te définit pas, ton action oui."
       ],
       echec: [
-        "Chaque échec est une leçon déguisée.",
-        "Ce n'est pas un échec, c'est une étape vers le succès.",
-        "Les plus grands ont échoué avant de réussir."
+        "Les échecs construisent les champions.",
+        "L’échec est juste un entraînement pour la réussite."
       ],
-      vide: [
-        "Tu as le pouvoir de créer du sens, même dans le vide.",
-        "Le vide n’est qu’une toile blanche. Peins ton avenir."
+      jamais: [
+        "Chaque réussite commence par un 'jamais' surmonté.",
+        "Le mot 'jamais' appartient à ceux qui abandonnent, pas à toi."
+      ],
+      intelligent: [
+        "Tu apprends chaque jour, et c’est ça le plus important.",
+        "Tu es plus capable que tu ne le penses."
+      ],
+      nul: [
+        "Tu n’es pas nul, tu es en apprentissage.",
+        "Ce n’est pas parce que tu tombes que tu n’avances pas."
       ]
     };
 
     function repondre() {
-      const input = document.getElementById("inputMessage").value.toLowerCase().trim();
-      const historique = document.getElementById("historique");
-      const audio = document.getElementById("son");
+      const phrase = document.getElementById("phrase").value.toLowerCase().trim();
+      const resultat = document.getElementById("resultat");
+      let reponse = "Ne laisse personne t’arrêter. Continue !";
 
-      let cle = Object.keys(reponses).find(mot => input.includes(mot));
-      let message;
-      if (cle) {
-        const possibles = reponses[cle];
-        message = possibles[Math.floor(Math.random() * possibles.length)];
-      } else {
-        message = "Tu es sur le bon chemin. Continue ainsi !";
+      for (let motCle in reponses) {
+        if (phrase.includes(motCle)) {
+          const options = reponses[motCle];
+          reponse = options[Math.floor(Math.random() * options.length)];
+          break;
+        }
       }
 
-      const bloc = `<p><strong>Tu :</strong> ${input || "(vide)"}<br><strong>Réponse :</strong> ${message}</p>`;
-      historique.innerHTML += bloc;
-      localStorage.setItem("historique", historique.innerHTML);
-      audio.play();
+      if (phrase === "") {
+        reponse = "Écris quelque chose pour recevoir un message motivant.";
+      }
+
+      resultat.innerHTML = `<strong>Réponse :</strong> ${reponse}`;
+      if (phrase !== "") sauvegarderHistorique(phrase, reponse);
     }
 
-    function reinitialiser() {
-      document.getElementById("historique").innerHTML = "";
-      localStorage.removeItem("historique");
+    function sauvegarderHistorique(phrase, reponse) {
+      let historique = JSON.parse(localStorage.getItem("historique")) || [];
+      historique.unshift({ phrase, reponse });
+      localStorage.setItem("historique", JSON.stringify(historique));
+      afficherHistorique();
     }
 
-    window.onload = function () {
-      const ancien = localStorage.getItem("historique");
-      if (ancien) document.getElementById("historique").innerHTML = ancien;
-    };
+    function afficherHistorique() {
+      const historique = JSON.parse(localStorage.getItem("historique")) || [];
+      const div = document.getElementById("historique");
+      if (historique.length === 0) {
+        div.innerHTML = "";
+        return;
+      }
+
+      div.innerHTML = "<h3>📜 Historique :</h3>";
+      historique.slice(0, 5).forEach(item => {
+        div.innerHTML += `<p><strong>Tu :</strong> ${item.phrase}<br><strong>Réponse :</strong> ${item.reponse}</p>`;
+      });
+    }
+
+    window.onload = afficherHistorique;
   </script>
 </body>
 </html>
